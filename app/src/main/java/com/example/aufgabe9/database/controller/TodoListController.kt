@@ -13,10 +13,27 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import javax.net.ssl.SSLEngineResult.Status
 
+/**
+ * Controller class for handling CRUD operations on the ToDo database.
+ *
+ * This class provides methods to insert, read, update, and delete ToDo items from the database.
+ * It communicates with the `DbHelper` to access the SQLite database, and it converts the data
+ * into `TodoListDataClass` objects for use in the application.
+ *
+ * @param context The application context, used to initialize the `DbHelper` instance.
+ */
 class TodoListController(context: Context) {
     private val dbHelper = DbHelper(context)
 
-    // CREATE: Insert a new ToDo into the database
+    /**
+     * Insert a new ToDo into the database.
+     *
+     * This method inserts a new `TodoListDataClass` instance into the `todos` table.
+     * It returns `true` if the insert operation was successful, and `false` if it failed.
+     *
+     * @param todo The `TodoListDataClass` instance representing the ToDo to be inserted.
+     * @return `true` if the insert was successful, `false` otherwise.
+     */
     fun insertTodo(todo: TodoListDataClass): Boolean {
         val db = dbHelper.writableDatabase
         return try {
@@ -39,7 +56,14 @@ class TodoListController(context: Context) {
         }
     }
 
-    // READ: Get all ToDos from the database
+    /**
+     * Get all ToDos from the database.
+     *
+     * This method retrieves all ToDo items from the `todos` table and converts them into a
+     * list of `TodoListDataClass` instances. It returns a list of all ToDos in the database.
+     *
+     * @return A list of `TodoListDataClass` objects representing all the ToDos in the database.
+     */
     fun getAllTodos(): List<TodoListDataClass> {
         val db = dbHelper.readableDatabase
         val todos = mutableListOf<TodoListDataClass>()
@@ -71,7 +95,15 @@ class TodoListController(context: Context) {
         return todos
     }
 
-    // UPDATE: Update an existing ToDo
+    /**
+     * Update an existing ToDo in the database.
+     *
+     * This method updates an existing ToDo item with new data. It returns `true` if the
+     * update was successful, and `false` if it failed.
+     *
+     * @param todo The `TodoListDataClass` instance representing the updated ToDo.
+     * @return `true` if the update was successful, `false` otherwise.
+     */
     fun updateTodo(todo: TodoListDataClass): Boolean {
         val db = dbHelper.writableDatabase
         return try {
@@ -92,7 +124,15 @@ class TodoListController(context: Context) {
         }
     }
 
-    // DELETE: Delete a ToDo by ID
+    /**
+     * Delete a ToDo by ID.
+     *
+     * This method deletes a ToDo item from the database using its unique ID. It returns `true`
+     * if the deletion was successful, and `false` if it failed.
+     *
+     * @param id The ID of the ToDo to delete.
+     * @return `true` if the deletion was successful, `false` otherwise.
+     */
     fun deleteTodoById(id: Int): Boolean {
         val db = dbHelper.writableDatabase
         return try {
@@ -106,8 +146,14 @@ class TodoListController(context: Context) {
         }
     }
 
-
-    // DELETE: Delete all ToDos
+    /**
+     * Delete all ToDos from the database.
+     *
+     * This method deletes all ToDo items from the `todos` table. It returns `true` if the
+     * deletion was successful, and `false` if it failed.
+     *
+     * @return `true` if the deletion was successful, `false` otherwise.
+     */
     fun deleteAllTodos(): Boolean {
         val db = dbHelper.writableDatabase
         return try {
@@ -119,6 +165,4 @@ class TodoListController(context: Context) {
             db.close()
         }
     }
-
-
 }

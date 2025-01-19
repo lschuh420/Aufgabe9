@@ -63,21 +63,28 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.aufgabe9.database.controller.TodoListController
 
 
+/**
+ * Eine Compose-Funktion, die die Benutzeroberfläche für die ToDo-Ansicht darstellt.
+ *
+ * @param title Titel der aktuellen ToDo-Ansicht (z.B. "Offene Aufgaben").
+ * @param filterCompleted Filterkriterium: Zeige nur abgeschlossene oder offene Aufgaben.
+ * @param onNavigateToCompleted Callback, um zwischen offenen und erledigten Aufgaben zu wechseln.
+ */
 @Composable
 fun TodoScreen(
     title: String,
     filterCompleted: Boolean,
     onNavigateToCompleted: () -> Unit
 ) {
-    val context = LocalContext.current
-    val todoListController = TodoListController(context)
+    val context = LocalContext.current // Kontext für Toasts und andere kontextabhängige Operationen
+    val todoListController = TodoListController(context) // Controller für ToDo-Datenbankoperationen
 
-    // ToDo-Liste und Zustände
-    var todoList by remember { mutableStateOf(todoListController.getAllTodos()) }
-    var showEditDialog by remember { mutableStateOf(false) }
-    var selectedTodo by remember { mutableStateOf<TodoListDataClass?>(null) }
+    // Zustand der gesamten ToDo-Liste und UI-Steuerung
+    var todoList by remember { mutableStateOf(todoListController.getAllTodos()) } // Aktuelle Liste der ToDos
+    var showEditDialog by remember { mutableStateOf(false) } // Steuert die Sichtbarkeit des Bearbeitungsdialogs
+    var selectedTodo by remember { mutableStateOf<TodoListDataClass?>(null) } // Ausgewähltes ToDo zum Bearbeiten
 
-    // Gefilterte ToDos basierend auf Status
+    // Filtert die ToDos basierend auf dem Status
     val filteredTodos = todoList.filter { todo ->
         if (filterCompleted) todo.status == 1 else todo.status == 0
     }
@@ -86,78 +93,95 @@ fun TodoScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    selectedTodo = null // Neues ToDo erstellen
-                    showEditDialog = true
+                    selectedTodo = null // Neues ToDo erstellen, kein ToDo vorausgewählt
+                    showEditDialog = true // Dialog anzeigen
                 },
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp) // Abstand um den FAB herum
             ) {
-                Text("+")
+                Text("+") // Text auf dem FAB
             }
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
+        Column(modifier = Modifier.padding(padding)) { // Inhalt der Seite
             // Header mit Titel und Navigation
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(bottom = 8.dp), // Abstand nach unten
+                horizontalArrangement = Arrangement.SpaceBetween, // Elemente links und rechts ausrichten
+                verticalAlignment = Alignment.CenterVertically // Vertikale Zentrierung der Elemente
             ) {
                 Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge
+                    text = title, // Titel der Seite anzeigen
+                    style = MaterialTheme.typography.titleLarge // Schriftstil anwenden
                 )
-                Button(onClick = onNavigateToCompleted) {
-                    Text(if (filterCompleted) "Zu Offenen" else "Zu Erledigten")
+                Button(onClick = onNavigateToCompleted) { // Button für Navigation zwischen Ansichten
+                    Text(if (filterCompleted) "Zu Offenen" else "Zu Erledigten") // Beschriftung des Buttons
                 }
             }
 
-            // ToDo-Liste anzeigen
-            if (filteredTodos.isEmpty()) {
+            // Anzeige der ToDo-Liste
+            if (filteredTodos.isEmpty()) { // Wenn keine ToDos vorhanden sind
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(), // Box nimmt gesamten verfügbaren Platz ein
+                    contentAlignment = Alignment.Center // Inhalt zentrieren
                 ) {
-                    Text("Keine ToDos gefunden.")
+                    Text("Keine ToDos gefunden.") // Nachricht anzeigen
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .fillMaxWidth() // Liste nimmt die gesamte Breite ein
+                        .weight(1f), // Flexibles Layout
+                    verticalArrangement = Arrangement.spacedBy(8.dp) // Abstand zwischen Elementen
                 ) {
-                    items(filteredTodos) { todo ->
+                    items(filteredTodos) { todo -> // Jedes ToDo wird als Karte dargestellt
                         TodoItemCard(
-                            item = todo,
-                            onItemClicked = { updatedTodo ->try {
-                                if (todoListController.updateTodo(updatedTodo)) {
-                                    Toast.makeText(context, "Status aktualisiert", Toast.LENGTH_SHORT).show()
-                                    todoList = todoListController.getAllTodos()
-                                } else {
-                                    Toast.makeText(context, "Fehler beim Aktualisieren", Toast.LENGTH_SHORT).show()
+                            item = todo, // Daten des ToDos
+                            /**
+                             * Callback, der ausgeführt wird, wenn auf ein ToDo geklickt wird.
+                             * Aktualisiert den Status des ToDos in der Datenbank.
+                             *
+                             * @param updatedTodo Das aktualisierte ToDo-Objekt.
+                             */
+                            onItemClicked = { updatedTodo ->
+                                try {
+                                    if (todoListController.updateTodo(updatedTodo)) {
+                                        Toast.makeText(context, "Status aktualisiert", Toast.LENGTH_SHORT).show()
+                                        todoList = todoListController.getAllTodos() // Liste aktualisieren
+                                    } else {
+                                        Toast.makeText(context, "Fehler beim Aktualisieren", Toast.LENGTH_SHORT).show()
+                                    }
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
-                            } catch (e: Exception) {
-                                Toast.makeText(context, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-
                             },
+                            /**
+                             * Callback, das ausgeführt wird, wenn ein ToDo gelöscht wird.
+                             *
+                             * @param todo Das zu löschende ToDo-Objekt.
+                             */
                             onDeletClicked = {
                                 try {
                                     if (todoListController.deleteTodoById(todo.id)) {
                                         Toast.makeText(context, "ToDo gelöscht", Toast.LENGTH_SHORT).show()
-                                        todoList = todoListController.getAllTodos()                                    } else {
+                                        todoList = todoListController.getAllTodos() // Liste aktualisieren
+                                    } else {
                                         Toast.makeText(context, "Fehler beim Löschen", Toast.LENGTH_SHORT).show()
                                     }
                                 } catch (e: Exception) {
                                     Toast.makeText(context, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
-
                             },
+                            /**
+                             * Callback, das ausgeführt wird, wenn ein ToDo bearbeitet wird.
+                             * Setzt das ausgewählte ToDo und zeigt den Bearbeitungsdialog an.
+                             *
+                             * @param todo Das zu bearbeitende ToDo-Objekt.
+                             */
                             onEditClick = {
-                                selectedTodo = todo
-                                showEditDialog = true
+                                selectedTodo = todo // Ausgewähltes ToDo speichern
+                                showEditDialog = true // Dialog anzeigen
                             }
                         )
                     }
@@ -166,18 +190,26 @@ fun TodoScreen(
         }
     }
 
-    // Bearbeitungs-Dialog
+    // Dialog für das Hinzufügen oder Bearbeiten eines ToDos
     if (showEditDialog) {
         EditTodoDialog(
-            todo = selectedTodo,
-            onDismiss = { showEditDialog = false },
+            todo = selectedTodo, // Übergeben des ausgewählten ToDos (null für neues ToDo)
+            /**
+             * Callback, um den Bearbeitungsdialog zu schließen.
+             */
+            onDismiss = { showEditDialog = false }, // Schließen des Dialogs
+            /**
+             * Callback, um ein neues ToDo zu speichern oder ein bestehendes zu aktualisieren.
+             *
+             * @param todo Das zu speichernde oder zu aktualisierende ToDo-Objekt.
+             */
             onSave = { todo ->
                 try {
                     if (todo.id == 0) {
                         // Neues ToDo hinzufügen
                         if (todoListController.insertTodo(todo)) {
                             Toast.makeText(context, "ToDo hinzugefügt", Toast.LENGTH_SHORT).show()
-                            todoList = todoListController.getAllTodos()
+                            todoList = todoListController.getAllTodos() // Liste aktualisieren
                         } else {
                             Toast.makeText(context, "Fehler beim Hinzufügen", Toast.LENGTH_SHORT).show()
                         }
@@ -185,34 +217,53 @@ fun TodoScreen(
                         // Bestehendes ToDo aktualisieren
                         if (todoListController.updateTodo(todo)) {
                             Toast.makeText(context, "ToDo aktualisiert", Toast.LENGTH_SHORT).show()
-                            todoList = todoListController.getAllTodos()
+                            todoList = todoListController.getAllTodos() // Liste aktualisieren
                         } else {
                             Toast.makeText(context, "Fehler beim Aktualisieren", Toast.LENGTH_SHORT).show()
                         }
                     }
-                }catch (e: Exception) {
+                } catch (e: Exception) {
                     Toast.makeText(context, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
-                showEditDialog = false
+                showEditDialog = false // Dialog schließen
             },
+            /**
+             * Callback, um ein ToDo zu löschen.
+             *
+             * @param todo Das zu löschende ToDo-Objekt.
+             */
             onDelete = { todo ->
                 try {
                     if (todoListController.deleteTodoById(todo.id)) {
                         Toast.makeText(context, "ToDo gelöscht", Toast.LENGTH_SHORT).show()
-                        todoList = todoListController.getAllTodos()
+                        todoList = todoListController.getAllTodos() // Liste aktualisieren
                     } else {
                         Toast.makeText(context, "Fehler beim Löschen", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Toast.makeText(context, "Fehler: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
-                showEditDialog = false
+                showEditDialog = false // Dialog schließen
             }
         )
     }
 }
 
 
+/**
+ * Composable function that represents a Todo item card in a list.
+ *
+ * This card displays the task name, priority, and a checkbox to mark the task as done.
+ * It also provides options for editing (long click) and deleting the task.
+ * Additionally, it has an expandable section for more task details like deadline and description.
+ *
+ * @param item The task item to display, encapsulated in a TodoListDataClass.
+ *             It contains the task name, description, priority, deadline, and status.
+ * @param onItemClicked Lambda function to handle the status change of the task
+ *                      when the checkbox is toggled.
+ * @param onDeletClicked Lambda function to handle the task deletion when the delete button is clicked.
+ * @param onEditClick Lambda function to handle the editing of the task when the card is long-pressed.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TodoItemCard(
@@ -221,33 +272,39 @@ fun TodoItemCard(
     onDeletClicked: () -> Unit,
     onEditClick: () -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) } // For dropdown expansion
-    var isChecked by remember { mutableStateOf(item.status == 1) } // Local checkbox state
+    // State to manage the expanded visibility of the dropdown
+    var expanded by remember { mutableStateOf(false) }
 
+    // State to manage the checkbox checked status based on the task's current status
+    var isChecked by remember { mutableStateOf(item.status == 1) }
+
+    // Card representing the todo item
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { expanded = !expanded }, // Toggles the dropdown
-                onLongClick = onEditClick // Opens edit dialog
+                onClick = { expanded = !expanded }, // Toggle the dropdown visibility
+                onLongClick = onEditClick // Open edit dialog on long click
             ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column {
+            // Row for task name, priority, and action buttons (delete and expand)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Checkbox to toggle ToDo status
+                // Checkbox to mark the task as done
                 Checkbox(
                     checked = item.status == 1,
                     onCheckedChange = { checked ->
-                        onItemClicked(item.copy(status = if (checked) 1 else 0))
+                        onItemClicked(item.copy(status = if (checked) 1 else 0)) // Update task status
                     }
                 )
 
+                // Column displaying the task name and priority
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = item.name,
@@ -263,11 +320,13 @@ fun TodoItemCard(
                         }
                     )
                 }
-                // Delete icon
+
+                // Delete button for removing the task
                 IconButton(onClick = { onDeletClicked() }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                 }
-                // Dropdown toggle icon
+
+                // Button to toggle the visibility of the dropdown (expand/collapse)
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -276,7 +335,7 @@ fun TodoItemCard(
                 }
             }
 
-            // Expanded content for additional details
+            // Animated visibility for additional task details (visible when expanded)
             AnimatedVisibility(visible = expanded) {
                 Column(
                     modifier = Modifier
@@ -299,6 +358,22 @@ fun TodoItemCard(
 
 
 
+/**
+ * Composable function that displays a dialog for editing or adding a Todo item.
+ *
+ * This dialog allows users to add a new Todo or edit an existing one. It includes input fields
+ * for the Todo's name, description, priority, and deadline. Additionally, if the Todo is being
+ * edited, a delete option is available.
+ *
+ * @param todo The existing Todo item to edit, or `null` to add a new Todo. It contains the task's
+ *             name, description, priority, deadline, and status.
+ * @param onDismiss Lambda function to handle the dismissal of the dialog (typically called when
+ *                  the user taps outside the dialog or cancels the action).
+ * @param onSave Lambda function to save the edited or newly created Todo. It takes a `TodoListDataClass`
+ *               instance with the updated information.
+ * @param onDelete Optional lambda function to delete the Todo when the delete button is clicked.
+ *                 This is only used when editing an existing Todo. If `null`, the delete button is not shown.
+ */
 @Composable
 fun EditTodoDialog(
     todo: TodoListDataClass?,
@@ -306,19 +381,21 @@ fun EditTodoDialog(
     onSave: (TodoListDataClass) -> Unit,
     onDelete: ((TodoListDataClass) -> Unit)? = null // Delete function, optional
 ) {
+    // States to manage the values in the input fields
     var name by remember { mutableStateOf(todo?.name ?: "") }
     var description by remember { mutableStateOf(todo?.description ?: "") }
     var selectedPriority by remember { mutableStateOf(todo?.priority ?: Priority.MEDIUM) }
     var deadline by remember { mutableStateOf(todo?.deadline ?: "") }
 
+    // AlertDialog to display the Todo edit form
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismiss, // Handle dialog dismiss
         title = {
             Text(text = if (todo == null) "Add New ToDo" else "Edit ToDo")
         },
         text = {
             Column {
-                // Input field for title
+                // Input field for the Todo title
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -328,7 +405,7 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Dropdown for priority
+                // Dropdown menu for priority selection
                 var expanded by remember { mutableStateOf(false) }
                 Text("Priority: ${selectedPriority.name}", modifier = Modifier.padding(bottom = 8.dp))
                 IconButton(onClick = { expanded = true }) {
@@ -351,7 +428,7 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Input field for description
+                // Input field for the Todo description
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
@@ -361,7 +438,7 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Input field for deadline
+                // Input field for the Todo deadline
                 OutlinedTextField(
                     value = deadline,
                     onValueChange = { deadline = it },
@@ -374,15 +451,16 @@ fun EditTodoDialog(
             Button(
                 onClick = {
                     if (name.isNotBlank()) {
+                        // Create a new Todo instance with the updated details
                         val updatedTodo = TodoListDataClass(
-                            id = todo?.id ?: 0, // Use existing ID or create a new one
+                            id = todo?.id ?: 0, // Use existing ID if editing or create a new one
                             name = name,
                             deadline = deadline,
                             description = description,
                             priority = selectedPriority,
                             status = todo?.status ?: 0 // Keep the same status if editing
                         )
-                        onSave(updatedTodo) // Save or update the ToDo
+                        onSave(updatedTodo) // Save the updated Todo
                     }
                 }
             ) {
@@ -391,8 +469,9 @@ fun EditTodoDialog(
         },
         dismissButton = {
             if (todo != null && onDelete != null) {
+                // Delete button is available only when editing an existing Todo
                 Button(
-                    onClick = { onDelete(todo) } // Call delete function
+                    onClick = { onDelete(todo) } // Call the delete function
                 ) {
                     Text("Delete")
                 }
