@@ -2,16 +2,10 @@ package com.example.aufgabe9.database.controller
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
-import android.os.Environment
 import android.util.Log
 import com.example.aufgabe9.database.DbHelper
-import com.example.aufgabe9.database.dataclass.TodoListDataClass
 import com.example.aufgabe9.database.dataclass.Priority
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import javax.net.ssl.SSLEngineResult.Status
+import com.example.aufgabe9.database.dataclass.TodoListDataClass
 
 /**
  * Controller class for handling CRUD operations on the ToDo database.
