@@ -13,68 +13,84 @@ Die ToDo-App bietet eine einfache und intuitive Möglichkeit, Aufgaben zu verwal
 
 ### Schritte zur Installation
 
-1. **Repository klonen**:
+### 1. Repository klonen:
    ```bash
    git clone https://github.com/username/todo-app.git
    cd todo-app
-2. Projekt in Android Studio importieren:
-  - Öffne Android Studio.
-Wähle File > Open und navigiere zum heruntergeladenen Ordner todo-app.
-Abhängigkeiten synchronisieren:
 
-Android Studio sollte automatisch die benötigten Abhängigkeiten synchronisieren.
-Falls nicht, klicke auf Sync Now, wenn du dazu aufgefordert wirst.
-Emulator einrichten (optional):
+### 2. Projekt in Android Studio importieren:
+- Öffne Android Studio.
+- Wähle `File > Open` und navigiere zum heruntergeladenen Ordner `todo-app`.
 
-Erstelle einen Android-Emulator in Android Studio (API-Level ≥ 21).
-App ausführen:
+### 3. Abhängigkeiten synchronisieren:
+- Android Studio sollte automatisch die benötigten Abhängigkeiten synchronisieren.
+- Falls nicht, klicke auf `Sync Now`, wenn du dazu aufgefordert wirst.
 
-Wähle ein Zielgerät oder einen Emulator aus.
-Klicke auf Run (Grüner Play-Button oben in Android Studio).
-App installieren:
+### Emulator einrichten (optional):
+- Erstelle einen Android-Emulator in Android Studio (API-Level ≥ 21).
 
-Die App wird automatisch auf dem Zielgerät installiert und gestartet.
-Funktionsbeschreibung ✨
-Hauptfunktionen
-ToDos anzeigen: Aufgaben werden nach ihrem Status (offen oder erledigt) gefiltert und angezeigt.
-Neue Aufgaben erstellen: Aufgaben mit Titel, Beschreibung, Priorität und Fälligkeitsdatum hinzufügen.
-Aufgaben bearbeiten: Titel, Beschreibung, Priorität oder Fälligkeitsdatum ändern.
-Aufgaben löschen: Aufgaben können vollständig entfernt werden.
-Status ändern: Aufgaben können als erledigt oder offen markiert werden.
-Filteroptionen: Wechsle zwischen offenen und erledigten Aufgaben.
-Modernes Design: Benutzerfreundliche Oberfläche mit klarer Struktur.
-Zusatzfunktionen
-Langklick-Funktion: Öffnet einen Dialog zum Bearbeiten von Aufgaben.
-Checkbox: Ändert den Status einer Aufgabe mit nur einem Klick.
-ToDo-Prioritäten: Jede Aufgabe kann mit einer Priorität (Hoch, Mittel, Niedrig) versehen werden, die optisch hervorgehoben wird.
-Verwendete Technologien 🛠️
-Programmiersprache und Framework
-Kotlin: Moderne Programmiersprache für Android-Entwicklung.
-Jetpack Compose: UI-Toolkit für deklaratives und reaktives App-Design.
-Datenmanagement
-SQLite: Lokale Datenbank für die persistenten Daten.
-TodoListController: Enthält die CRUD-Logik (Create, Read, Update, Delete).
-UI-Komponenten
-Material 3: Für modernes, intuitives und ästhetisches UI-Design.
-LazyColumn: Für effizientes Rendern von Listen.
-AlertDialog: Zur Bearbeitung und Bestätigung von Aktionen.
-Entwicklungswerkzeuge
-Android Studio: IDE für Android-Entwicklung.
-Live Templates: Beschleunigen die Code-Generierung.
-Bekannte Probleme 🐞
-UI-Flackern bei schnellem Scrollen:
+### App ausführen:
+- Wähle ein Zielgerät oder einen Emulator aus.
+- Klicke auf `Run` (Grüner Play-Button oben in Android Studio).
 
-Wenn die Liste sehr groß ist, kann es beim Scrollen zu geringem Flackern kommen.
-Lösung: Implementiere LazyColumn mit optimierten key-Werten.
-Datenbank-Fehler bei leerem Eingabefeld:
+### App installieren:
+- Die App wird automatisch auf dem Zielgerät installiert und gestartet.
 
-Wenn ein ToDo ohne Titel gespeichert wird, kann ein Fehler auftreten.
-Lösung: Validierung hinzufügen, um leere Eingaben zu verhindern.
-Dialog-Überlagerung auf kleinen Bildschirmen:
+---
 
-Auf Geräten mit kleinen Bildschirmen kann der Bearbeitungsdialog unübersichtlich werden.
-Lösung: Scrollable-Layout im Dialog verwenden.
-Keine Cloud-Synchronisierung:
+## ✨ Funktionsbeschreibung
 
-Derzeit können ToDos nur lokal gespeichert werden.
-Mögliche Erweiterung: Firebase oder ein REST-Backend hinzufügen.
+### **Hauptfunktionen**
+- **ToDos anzeigen**: Aufgaben werden nach ihrem Status (offen oder erledigt) gefiltert und angezeigt.
+- **Neue Aufgaben erstellen**: Aufgaben mit Titel, Beschreibung, Priorität und Fälligkeitsdatum hinzufügen.
+- **Aufgaben bearbeiten**: Titel, Beschreibung, Priorität oder Fälligkeitsdatum ändern.
+- **Aufgaben löschen**: Aufgaben können vollständig entfernt werden.
+- **Status ändern**: Aufgaben können als erledigt oder offen markiert werden.
+- **Filteroptionen**: Wechsle zwischen offenen und erledigten Aufgaben.
+- **Modernes Design**: Benutzerfreundliche Oberfläche mit klarer Struktur.
+
+### **Zusatzfunktionen**
+- **Langklick-Funktion**: Öffnet einen Dialog zum Bearbeiten von Aufgaben.
+- **Checkbox**: Ändert den Status einer Aufgabe mit nur einem Klick.
+- **ToDo-Prioritäten**: Jede Aufgabe kann mit einer Priorität (Hoch, Mittel, Niedrig) versehen werden, die optisch hervorgehoben wird.
+
+---
+
+## 🛠️ Verwendete Technologien
+
+### **Programmiersprache und Framework**
+- **Kotlin**: Moderne Programmiersprache für Android-Entwicklung.
+- **Jetpack Compose**: UI-Toolkit für deklaratives und reaktives App-Design.
+
+### **Datenmanagement**
+- **SQLite**: Lokale Datenbank für die persistenten Daten.
+- **TodoListController**: Enthält die CRUD-Logik (Create, Read, Update, Delete).
+
+### **UI-Komponenten**
+- **Material 3**: Für modernes, intuitives und ästhetisches UI-Design.
+- **LazyColumn**: Für effizientes Rendern von Listen.
+- **AlertDialog**: Zur Bearbeitung und Bestätigung von Aktionen.
+
+### **Entwicklungswerkzeuge**
+- **Android Studio**: IDE für Android-Entwicklung.
+- **Live Templates**: Beschleunigen die Code-Generierung.
+
+---
+
+## 🐞 Bekannte Probleme
+
+1. **UI-Flackern bei schnellem Scrollen**:
+   - Wenn die Liste sehr groß ist, kann es beim Scrollen zu geringem Flackern kommen.
+   - **Lösung**: Implementiere `LazyColumn` mit optimierten `key`-Werten.
+
+2. **Datenbank-Fehler bei leerem Eingabefeld**:
+   - Wenn ein ToDo ohne Titel gespeichert wird, kann ein Fehler auftreten.
+   - **Lösung**: Validierung hinzufügen, um leere Eingaben zu verhindern.
+
+3. **Dialog-Überlagerung auf kleinen Bildschirmen**:
+   - Auf Geräten mit kleinen Bildschirmen kann der Bearbeitungsdialog unübersichtlich werden.
+   - **Lösung**: Scrollable-Layout im Dialog verwenden.
+
+4. **Keine Cloud-Synchronisierung**:
+   - Derzeit können ToDos nur lokal gespeichert werden.
+   - **Mögliche Erweiterung**: Firebase oder ein REST-Backend hinzufügen.
