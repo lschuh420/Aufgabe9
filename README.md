@@ -17,7 +17,7 @@ Die ToDo-App bietet eine einfache und intuitive Möglichkeit, Aufgaben zu verwal
    ```bash
    git clone https://github.com/username/todo-app.git
    cd todo-app
-
+   ```
 ### 2. Projekt in Android Studio importieren:
 - Öffne Android Studio.
 - Wähle `File > Open` und navigiere zum heruntergeladenen Ordner `todo-app`.
