@@ -1,22 +1,24 @@
-ToDo App
-Die ToDo-App bietet eine einfache und intuitive Möglichkeit, Aufgaben zu verwalten. Sie wurde mit Jetpack Compose in Kotlin entwickelt und bietet moderne Funktionen wie Status- und Prioritätsmanagement, CRUD-Operationen und Filter.
+# ToDo App
 
-Installationsanleitung 🚀
-Voraussetzungen
-Entwicklungsumgebung: Android Studio (Version 2022.2.1 oder höher empfohlen)
-Java-Version: Java 11 oder neuer
-Android-Gerät oder Emulator: API-Level 21 (Android 5.0) oder höher
-Schritte zur Installation
-Repository klonen: Lade das Projekt herunter, indem du das folgende Kommando ausführst:
+Die ToDo-App bietet eine einfache und intuitive Möglichkeit, Aufgaben zu verwalten. Sie wurde mit **Jetpack Compose** in Kotlin entwickelt und bietet moderne Funktionen wie Status- und Prioritätsmanagement, CRUD-Operationen und Filter.
 
-bash
-Kopieren
-Bearbeiten
-git clone https://github.com/username/todo-app.git
-cd todo-app
-Projekt in Android Studio importieren:
+---
 
-Öffne Android Studio.
+## Installationsanleitung 🚀
+
+### Voraussetzungen
+- **Entwicklungsumgebung**: Android Studio (Version 2022.2.1 oder höher empfohlen)
+- **Java-Version**: Java 11 oder neuer
+- **Android-Gerät oder Emulator**: API-Level 21 (Android 5.0) oder höher
+
+### Schritte zur Installation
+
+1. **Repository klonen**:
+   ```bash
+   git clone https://github.com/username/todo-app.git
+   cd todo-app
+2. Projekt in Android Studio importieren:
+  - Öffne Android Studio.
 Wähle File > Open und navigiere zum heruntergeladenen Ordner todo-app.
 Abhängigkeiten synchronisieren:
 
