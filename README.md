@@ -4,7 +4,7 @@ Die ToDo-App bietet eine einfache und intuitive Möglichkeit, Aufgaben zu verwal
 
 ---
 
-## Installationsanleitung 🚀
+## 🚀 Installationsanleitung 
 
 ### Voraussetzungen
 - **Entwicklungsumgebung**: Android Studio (Version 2022.2.1 oder höher empfohlen)
