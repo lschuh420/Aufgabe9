@@ -47,6 +47,18 @@ import androidx.compose.ui.unit.dp
 import com.example.aufgabe9.database.controller.TodoListController
 import com.example.aufgabe9.database.dataclass.Priority
 import com.example.aufgabe9.database.dataclass.TodoListDataClass
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 /**
@@ -65,6 +77,8 @@ fun TodoScreen(
     val context = LocalContext.current // Kontext für Toasts und andere kontextabhängige Operationen
     val todoListController = TodoListController(context) // Controller für ToDo-Datenbankoperationen
 
+    var selectedTab by remember { mutableStateOf(0) } // 0 = "Aktive ToDos", 1 = "Erledigte ToDos"
+
     // Zustand der gesamten ToDo-Liste und UI-Steuerung
     var todoList by remember { mutableStateOf(todoListController.getAllTodos()) } // Aktuelle Liste der ToDos
     var showEditDialog by remember { mutableStateOf(false) } // Steuert die Sichtbarkeit des Bearbeitungsdialogs
@@ -76,35 +90,45 @@ fun TodoScreen(
     }
 
     Scaffold(
+        topBar = {
+            // TabRow für Navigation
+            TabRow(selectedTabIndex = if (filterCompleted) 1 else 0) {
+                Tab(
+                    text = { Text("Aktive ToDos") },
+                    selected = !filterCompleted,
+                    onClick = {
+                        if (filterCompleted) { // Nur navigieren, wenn der aktuelle Tab nicht bereits aktiv ist
+                            onNavigateToCompleted() // Navigiere zu den aktiven ToDos
+                        }
+                    }
+                )
+                Tab(
+                    text = { Text("Erledigte ToDos") },
+                    selected = filterCompleted,
+                    onClick = {
+                        if (!filterCompleted) { // Nur navigieren, wenn der aktuelle Tab nicht bereits aktiv ist
+                            onNavigateToCompleted() // Navigiere zu den erledigten ToDos
+                        }
+                    }
+                )
+
+            }
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    selectedTodo = null // Neues ToDo erstellen, kein ToDo vorausgewählt
-                    showEditDialog = true // Dialog anzeigen
+                    selectedTodo = null // Start with a new ToDo
+                    showEditDialog = true // Show the dialog
                 },
-                modifier = Modifier.padding(16.dp) // Abstand um den FAB herum
+                modifier = Modifier.padding(16.dp)
             ) {
-                Text("+") // Text auf dem FAB
+                Text("+") // FAB with "+" text
             }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) { // Inhalt der Seite
             // Header mit Titel und Navigation
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp), // Abstand nach unten
-                horizontalArrangement = Arrangement.SpaceBetween, // Elemente links und rechts ausrichten
-                verticalAlignment = Alignment.CenterVertically // Vertikale Zentrierung der Elemente
-            ) {
-                Text(
-                    text = title, // Titel der Seite anzeigen
-                    style = MaterialTheme.typography.titleLarge // Schriftstil anwenden
-                )
-                Button(onClick = onNavigateToCompleted) { // Button für Navigation zwischen Ansichten
-                    Text(if (filterCompleted) "Zu Offenen" else "Zu Erledigten") // Beschriftung des Buttons
-                }
-            }
+
 
             // Anzeige der ToDo-Liste
             if (filteredTodos.isEmpty()) { // Wenn keine ToDos vorhanden sind
@@ -358,6 +382,7 @@ fun TodoItemCard(
  * @param onDelete Optional lambda function to delete the Todo when the delete button is clicked.
  *                 This is only used when editing an existing Todo. If `null`, the delete button is not shown.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTodoDialog(
     todo: TodoListDataClass?,
@@ -365,13 +390,51 @@ fun EditTodoDialog(
     onSave: (TodoListDataClass) -> Unit,
     onDelete: ((TodoListDataClass) -> Unit)? = null // Delete function, optional
 ) {
-    // States to manage the values in the input fields
+    // States for the Todo fields
     var name by remember { mutableStateOf(todo?.name ?: "") }
     var description by remember { mutableStateOf(todo?.description ?: "") }
     var selectedPriority by remember { mutableStateOf(todo?.priority ?: Priority.MEDIUM) }
     var deadline by remember { mutableStateOf(todo?.deadline ?: "") }
 
-    // AlertDialog to display the Todo edit form
+    val context = LocalContext.current
+    val calendar = remember { Calendar.getInstance() }
+
+    // Function to open TimePicker
+    fun openTimePicker() {
+        TimePickerDialog(
+            context,
+            { _, hour, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                calendar.set(Calendar.MINUTE, minute)
+
+                // Format the date and time and set it to the deadline
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                deadline = dateFormat.format(calendar.time)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true // Use 24-hour format
+        ).show()
+    }
+
+    // Function to open DatePicker
+    fun openDatePicker() {
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                // After selecting date, open TimePicker
+                openTimePicker()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss, // Handle dialog dismiss
         title = {
@@ -389,24 +452,46 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Dropdown menu for priority selection
+                // Dropdown menu for priority selection using ExposedDropdownMenuBox
                 var expanded by remember { mutableStateOf(false) }
-                Text("Priority: ${selectedPriority.name}", modifier = Modifier.padding(bottom = 8.dp))
-                IconButton(onClick = { expanded = true }) {
-                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
                 ) {
-                    Priority.entries.forEach { priority ->
-                        DropdownMenuItem(
-                            text = { Text(priority.name) },
-                            onClick = {
-                                selectedPriority = priority
-                                expanded = false
-                            }
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        OutlinedTextField(
+                            value = selectedPriority.name,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Priority") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                            },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
                         )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            Priority.entries.forEach { priority ->
+                                DropdownMenuItem(
+                                    text = { Text(priority.name) },
+                                    onClick = {
+                                        selectedPriority = priority
+                                        expanded = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -422,12 +507,20 @@ fun EditTodoDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Input field for the Todo deadline
+                // DateTimePicker for deadline
                 OutlinedTextField(
                     value = deadline,
-                    onValueChange = { deadline = it },
+                    onValueChange = { },
                     label = { Text("Enter Deadline") },
-                    modifier = Modifier.fillMaxWidth()
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { openDatePicker() }, // Open DatePicker on click
+                    trailingIcon = {
+                        IconButton(onClick = { openDatePicker() }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Select Deadline")
+                        }
+                    }
                 )
             }
         },

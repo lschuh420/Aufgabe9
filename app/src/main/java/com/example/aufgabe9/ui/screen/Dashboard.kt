@@ -21,7 +21,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun Dashboard() {
     // Initialize NavController for handling navigation
-    val navController = rememberNavController()
+    var navController = rememberNavController()
 
 
 

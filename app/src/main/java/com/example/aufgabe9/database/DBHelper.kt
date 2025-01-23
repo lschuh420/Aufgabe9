@@ -48,6 +48,5 @@ class DbHelper(val context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, 
     companion object {
         const val DATABASE_NAME = "TodoAppDataBank.db"
         const val DATABASE_VERSION = 1
-
     }
 }
